@@ -4,10 +4,10 @@
 
 url: http://manute.github.io
 title: Manute Blog
-subtitle: Things of programing.
+subtitle: 
 author: Manuel Alonso 
 simple_search: http://google.com/search
-description: Blog about programming nothing more.
+description: Things of programing.
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
@@ -19,7 +19,7 @@ date_format: "ordinal"
 subscribe_rss: /atom.xml
 subscribe_email:
 # RSS feeds can list your email address if you like
-email:
+email: manuteali@gmail.com
 
 # ----------------------- #
 #    Jekyll & Plugins     #
@@ -90,7 +90,7 @@ delicious_user:
 delicious_count: 3
 
 # Disqus Comments
-disqus_short_name: ManuelAlonso
+disqus_short_name: manuteblog
 disqus_show_comment_count: true
 
 # Google Analytics
