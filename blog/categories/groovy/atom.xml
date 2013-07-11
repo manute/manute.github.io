@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Manute Blog]]></title>
-  <link href="http://manute.github.io/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Groovy | Manute Blog]]></title>
+  <link href="http://manute.github.io/blog/categories/groovy/atom.xml" rel="self"/>
   <link href="http://manute.github.io/"/>
   <updated>2013-07-11T15:36:06+02:00</updated>
   <id>http://manute.github.io/</id>
@@ -28,9 +28,9 @@ There is also one book(in spanish) very good for Erlang and is free from <strong
 
 <p>Groovy has much functional style , in fact , the <strong><a href="http://groovy.codehaus.org/Closures">closures</a>  </strong> for me is a clear example:</p>
 
-<div><script src='https://gist.github.com/5311752.js'></script>
+<p><div><script src='https://gist.github.com/5311752.js'></script>
 <noscript><pre><code></code></pre></noscript></div>
-
+</p>
 
 <p></br></p>
 
@@ -44,9 +44,9 @@ For example, I will mimic the function <strong>map/2 from Erlang</strong> and I
 
 <p>Is a function that takes a function F  and list L as arguments and returns the new list that is obtained by applying F to each of the elements in L.</p>
 
-<div><script src='https://gist.github.com/5327266.js'></script>
+<p><div><script src='https://gist.github.com/5327266.js'></script>
 <noscript><pre><code></code></pre></noscript></div>
-
+</p>
 
 <p>I&rsquo;ve done a bit tricky, because in reality the &ldquo;map&rdquo; function does not apply on a list already created, but I did so to show how to add a method to the List class dynamically. But I made ​​it more functional as possible, without modifying the original list and returning a new list( it is not inmutable, in Groovy to make a List inmutable call &ndash;> <strong><a href="http://groovy.codehaus.org/groovy-jdk/java/util/List.html#asImmutable()">asInmutable()</a></strong> )</p>
 
@@ -59,9 +59,9 @@ For example, I will mimic the function <strong>map/2 from Erlang</strong> and I
 
 <p>This function is the common use-case for map : extracting a list of property values.</p>
 
-<div><script src='https://gist.github.com/5318651.js'></script>
+<p><div><script src='https://gist.github.com/5318651.js'></script>
 <noscript><pre><code></code></pre></noscript></div>
-
+</p>
 
 <p>As we see it is very easy to add functions to the Groovy List class, that are useful and / or we use a lot. In addition to obtain clean code, we can combine them to make still more powerful.</p>
 
