@@ -4,6 +4,9 @@ title: "Add content dynamically to Popover Bootstrap"
 date: 2013-07-12 11:35
 comments: true
 categories: [TwitterBootstrap,Javascript]
+
+keywords: javascript,twitterbootstrap,popover
+description: Change dynamically the content of a popover generate also dynamically 
 ---
 
 The use-case is:  

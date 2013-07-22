@@ -4,6 +4,9 @@ title: Functional Lists in Groovy
 date: 2013-07-11 11:13
 comments: true
 categories: [Groovy, Functional]
+
+keywords: groovy,list,functional
+description: Examples groovy of functional lists from other languages 
 ---
 
 
