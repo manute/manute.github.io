@@ -6,7 +6,7 @@ comments: true
 categories: [Groovy, Functional]
 
 keywords: groovy,list,functional
-description: Examples groovy of functional lists from other languages 
+description: Examples groovy of functional lists from other languages
 ---
 
 

@@ -6,10 +6,10 @@ comments: true
 categories: [TwitterBootstrap,Javascript]
 
 keywords: javascript,twitterbootstrap,popover
-description: Change dynamically the content of a popover generate also dynamically 
+description: Change dynamically the content of a popover generate also dynamically
 ---
 
-The use-case is:  
+The use-case is:
 <ul>
  <li>Click in the bottom.</li>
  <li>Show Popover.</li>

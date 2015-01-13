@@ -4,10 +4,10 @@
 
 url: http://manute.github.io
 title: Manute Blog
-subtitle: 
-author: Manuel Alonso 
+subtitle:
+author: Manuel Alonso
 simple_search: http://google.com/search
-description: Things of programing.
+description:
 
 # Default date format is "ordinal" (resulting in "July 22nd 2007")
 # You can customize the format as defined in
