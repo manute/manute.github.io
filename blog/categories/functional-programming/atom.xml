@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: functional programming | Manute Blog]]></title>
+  <link href="http://manute.github.io/blog/categories/functional-programming/atom.xml" rel="self"/>
+  <link href="http://manute.github.io/"/>
+  <updated>2015-01-13T13:26:03+01:00</updated>
+  <id>http://manute.github.io/</id>
+  <author>
+    <name><![CDATA[Manuel Alonso]]></name>
+    <email><![CDATA[manuteali@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Introduction to Elixir]]></title>
+    <link href="http://manute.github.io/blog/2015/01/12/introduction-to-elixir/"/>
+    <updated>2015-01-12T20:22:51+01:00</updated>
+    <id>http://manute.github.io/blog/2015/01/12/introduction-to-elixir</id>
+    <content type="html"><![CDATA[<p><strong><a href="http://manute.github.io/slides/intro-elixir.html">Slides (in Spanish) </a></strong> of my talk in the Functional Programming Meetup of Madrid .</p>
+]]></content>
+  </entry>
+  
+</feed>

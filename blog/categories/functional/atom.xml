@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: functional | Manute Blog]]></title>
+  <link href="http://manute.github.io/blog/categories/functional/atom.xml" rel="self"/>
+  <link href="http://manute.github.io/"/>
+  <updated>2015-01-13T13:26:03+01:00</updated>
+  <id>http://manute.github.io/</id>
+  <author>
+    <name><![CDATA[Manuel Alonso]]></name>
+    <email><![CDATA[manuteali@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Functional Lists in Groovy]]></title>
+    <link href="http://manute.github.io/blog/2013/07/11/functional-lists-in-groovy/"/>
+    <updated>2013-07-11T11:13:00+02:00</updated>
+    <id>http://manute.github.io/blog/2013/07/11/functional-lists-in-groovy</id>
+    <content type="html"><![CDATA[<p>Lately I&rsquo;m reading books on functional programming languages ​​like  <strong>Clojure</strong> and <strong>Erlang.</strong>
+There is a book for Erlang that covers all aspect of the language <strong><a href="http://pragprog.com/book/jaerlang/programming-erlang" target="_blank">Programming Erlang</a></strong>.
+There is also one book(in spanish) very good for Erlang and is free from <strong><a href="http://bosqueviejo" target="_blank">bosqueviejo</a></strong>. And for Clojure there are many like <strong><a href="http://www.joyofclojure.com/" target="_blank">The Joy of Clojure</a></strong> or <strong><a href="https://leanpub.com/fp-oo" target="_blank">Functional Programming for the Object-Oriented Programmer</a></strong>.
+</br></p>
+
+<p>What I&rsquo;ve learned in these books is to think of another way to abstract problems and break them into reusable functions (also aspects such as concurrency, immutability and recursion).
+</br></p>
+
+<p>Groovy has much functional style , in fact , the <strong><a href="http://groovy.codehaus.org/Closures">closures</a>  </strong> for me is a clear example:</p>
+
+<p><div><script src='https://gist.github.com/5311752.js'></script>
+<noscript><pre><code>def multiplyBy2 = {element -&gt; element * 2 }
+
+/* 
+  &#39;collect&#39;, is the function to iterate list and return the result apply to the closure
+*/
+
+assert [1,2,3].collect{ it * 2 }  == [2,4,6]
+assert [1,2,3].collect{ multiplyBy2(it) } == [2,4,6]
+</code></pre></noscript></div>
+</p>
+
+<p></br></p>
+
+<p>The functions that I will show below, I will add them to the class <strong><a href="http://groovy.codehaus.org/groovy-jdk/java/util/List.html">List</a></strong> dynamically by the metaclass. I think it&rsquo;s better example that only show the functions , because then can reuse the functions in other parts of project.</p>
+
+<p></br>
+For example, I will mimic the function <strong>map/2 from Erlang</strong> and I will add to the Groovy List class.</p>
+
+<h2><strong>Map</strong></h2>
+
+
+<p>Is a function that takes a function F  and list L as arguments and returns the new list that is obtained by applying F to each of the elements in L.</p>
+
+<p><div><script src='https://gist.github.com/5327266.js'></script>
+<noscript><pre><code>/*
+Closure with 2  arguments:
+  -closure_F is the function F
+  -list_L is list L
+*/
+def map = {  list_L , closure_F -&gt; 
+    
+    // Delegate is the elment to actue over
+    delegate.collect(list_L) { element -&gt;
+            
+        closure_F(element)
+    }          
+ 
+}
+ 
+// Add to metaClass of List dynamically with name &quot;map&quot;    
+List.metaClass.map = map 
+ 
+def list = [1,2,3,4] 
+def newList = []  
+ 
+list.map(  newList  ){ it * 2 } 
+ 
+assert newList == [2,4,6,8] 
+assert list == [1,2,3,4]  </code></pre></noscript></div>
+</p>
+
+<p>I&rsquo;ve done a bit tricky, because in reality the &ldquo;map&rdquo; function does not apply on a list already created, but I did so to show how to add a method to the List class dynamically. But I made ​​it more functional as possible, without modifying the original list and returning a new list( it is not inmutable, in Groovy to make a List inmutable call -> <strong><a href="http://groovy.codehaus.org/groovy-jdk/java/util/List.html#asImmutable()">asInmutable()</a></strong> )</p>
+
+<p>Be careful with add methods by metaClass , because if a method already exists with the same name it will be overwritten.</p>
+
+<p>Let&rsquo;s do another example, I&rsquo;ll imitate the function <strong><a href="http://underscorejs.org/#pluck"> pluck of Underscore.js </a></strong>.</p>
+
+<h2><strong>Pluck</strong></h2>
+
+
+<p>This function is the common use-case for map : extracting a list of property values.</p>
+
+<p><div><script src='https://gist.github.com/5318651.js'></script>
+<noscript><pre><code>/*
+One argument:
+    -propertyName 
+*/
+def pluck = { propertyName -&gt; 
+
+    // Collect results filter coincidence by propertyName   
+    delegate.collect { element -&gt;
+            
+        element.&quot;$propertyName&quot;
+    }          
+}
+// Add &quot;pluck&quot; to metaClass of List  
+List.metaClass.pluck = pluck 
+      
+def users = [[name:&quot;Joe&quot;,age:32],[name:&#39;Jhon&#39;,age:20],[name:&#39;Mary&#39;,age:25]]
+assert users.pluck(&quot;name&quot;) == [&quot;Joe&quot;,&quot;Jhon&quot;,&quot;Mary&quot;]
+
+</code></pre></noscript></div>
+</p>
+
+<p>As we see it is very easy to add functions to the Groovy List class, that are useful and / or we use a lot. In addition to obtain clean code, we can combine them to make still more powerful.</p>
+
+<p>Note: If you use <strong><a href="http://grails.org/">Grails</a></strong> these functions can be added dynamically with the Bootstrap.groovy ; so these functions can be used in all the classes of the project.</p>
+]]></content>
+  </entry>
+  
+</feed>

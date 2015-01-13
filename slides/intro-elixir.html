@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Elixir - Introducción</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# ELIXIR
+   # |>
+
+
+---
+
+# ¿Qué es?
+
+Lenguaje dinámico y funcional de proposito general que corre sobre la Erlang VM, conocida por su funcionamiento de baja latencia y alta disponibilidad en sistemas distribuidos.
+
+---
+
+# ¿Características principales?
+
+* Inmutabilidad
+* Pattern Matching
+* Concurrencia - Erlang VM (Actors)
+* Sintaxis (a la Ruby)
+* Protocols (a la Clojure)
+* Macros
+* OTP (herramintas y conjunto de librerias)
+* REPL (read-eval-print-loop)
+* Hot Code Swapping
+
+---
+
+class: center, middle
+
+# Types
+
+
+---
+
+# Value Types
+
+* **Integers**
+  ```
+  1234 #decimal
+  0b1010 #binary
+  0xcafe #hexadecimal
+  0o765 #octal
+  1_000_000
+  ```
+* **Floats**
+
+ Se separa con el punto decimal y tienen cerca de 16 dígitos de precisión y un exponente máximo de alrededor de 10.308.
+
+  ```
+  1.0  0.2456  0.314159e1  314159.0e-5
+  ```
+
+---
+
+* **Atoms**
+
+ Constantes que representan un nombre.
+
+  ```
+  :jhon  :is_binary?  :var@2  :===
+  ```
+* **Range**
+
+  Se representan como *start..end* y pueden ser de cualquier tipo. Sin embargo, si se quiere iterar sobre sus valores  deben ser *Integers*.
+
+  ```
+  1..10
+  ```
+* **Regular Expressions**
+
+  Se representan así *~r{regexp}* o *~r{regexp}opts.*
+
+
+  ```
+  Regex.scan ~r{[aeiou]}, “caterpillar” #[[“a”][“e”][“i”][“a”]]
+
+  Regex.replace ~r{[aeiou]}, "caterpillar", "*" # "c*t*rp*ll*r"
+  ```
+---
+
+* **Strings**
+
+  * Pueden tener carácteres en UTF-8
+  ```
+  string = "hełło" # hełło
+  byte_size string # 7
+  String.length string # 5
+  ```
+  * Pueden representarse como lista de caracteres con *' '*
+  ```
+  str = 'wombat' # 'wombat'
+  is_list str # true
+  Enum.reverse str # 'tabmow'
+  ```
+
+  * Se puede obtener el codepoint con *?*
+  ```
+  ?a # 97
+  ?ł #322
+  ```
+
+  * Permiten la interpolación en las expresiones Elixir utilizando la sintaxis *#{...}*.
+  ```
+  "Hello, #{String.capitalize "manu"}!" #"Hello, Manu""
+  ```
+---
+**Strings II **
+
+  * Sigils
+  ```
+  ~C[1\n2#{1+2}] #'1\\n2\#{1+2}'
+  ```
+  Como en Ruby, una sintaxis alternativa para algunos literales ej: *regular expressions*.
+
+  Empieza con *~* seguido de una letra mayúscula o minúscula , un delimitador y unas opciones.
+  Los delimitadores pueden ser *<...>, {...}, [...], (...), |...|, /.../, "...", y '...'*.
+
+  * Soportan *Heredocs*
+
+    Cualquier String soporta varias lineas dentro. La *heredoc* notation *"""* arregla que no se queden espacios o saltos entre ellos.Es muy útil para la documentación de modulos y funciones.
+    ```
+    IO.puts "start"
+    IO.write """
+      my
+      string
+    """
+    IO.puts "end"
+
+    ```
+---
+
+# Sistem Types
+
+* **PIDS**
+
+  Referencias a  procesos locales o remotos, *self* nos dará el actual pid.
+  ```
+    self  #PID<0.53.0>
+  ```
+* **Ports**
+
+  Referencias a recursos, normalmente externos a la aplicación (leer o escribir).
+
+  ```
+    Port.list() #[#Port<0.0>, #Port<0.239>, #Port<0.667>]
+  ```
+* **References**
+
+  Referencias globales únicas (*make_ref*).
+
+---
+
+# Collection Types
+
+* **Tuples**
+  ```
+    {1, 2}
+    {:ok, 42, "next"}
+  ```
+* **Lists**
+  ```
+    [1, 2 ,3 ]
+    [name: "David" , age: 32] # [{:name , "David"}, {:age , 32}]
+    [1, 2] ++ [3 , 4] # [1, 2 , 3 , 4] ;
+    [1, 2, 3, 4] -- [3 , 4] # [1, 2 ] ;
+    1  in [1, 3] # true
+  ```
+* **Maps**
+  ```
+  state = %{ “AL” => “Alabama”} # state[“AL”] -> “Alabama”
+  %{{:error, :busy} => :retry , {:error, :enoent} => :fatal}
+  ```
+* **Binaries**
+  ```
+   <<1 , 2 >> # ej leer cabecereas ficheros
+  ```
+
+---
+
+# Boolean
+
+* **true, false** y **nil**
+
+* nil es tratado como false.
+
+* Tienen alias
+
+  ```
+    :true # true
+    :false # false
+    :nil # nil
+  ```
+  Muy útil para operaciones en tuples, maps , pattern matching..
+
+---
+
+class: center, middle
+
+# Operators
+
+
+---
+
+# Comparision
+
+* Igualdad y desigualdad estricta.
+```
+  1.0 === 1 # false
+  1 === 1 # true
+
+  1 !== 1 # false
+  1 !== 1.0 # true
+```
+* Igualdad y desigualdad por valor.
+```
+  1.0 == 1 # true
+  1 != 1.0 # false
+```
+
+* Mayor, igual o menor.
+```
+  1 > 2 # false
+  1 <= 2 # true
+```
+---
+
+# Boolean operators
+
+* **a or b** ; **a || b**
+
+  true si a es true, si no b
+
+* **a and b** ; **a && b**
+
+  true si a y b son true, si no false
+
+* **not a ** ; **!a**
+
+  false si a es true , si no true
+
+---
+
+class: center, middle
+
+# Pattern Matching
+
+---
+
+En Elixir ``` a = 1 ``` no es un asignación es como una aserción, como un contrato.
+
+Tiene éxito si puede encontrar una manera de hacer que el lado izquierdo sea igual al lado derecho.
+
+```
+ a = 1  #  1
+ 1 = a  #  1
+ 2 = a  #  ** (MatchError) no match of right hand side value: 1
+```
+En listas:
+```
+ list = [1, 2 , 3]  # [1 , 2, 3]
+ [a , b , c ] = list # a → 1 ; b → 2 ; c → 3
+```
+Ignorando valores con  *_* :
+```
+ [1 , _ , _ ] = [1 , “cat , “dog”] # [1, “cat”, “dog”]
+```
+*head* y *tail* :
+```
+ [ h | t ] = [1, 2, 3] # h 1 ; t [2, 3]
+
+```
+
+---
+
+class: center, middle
+
+# Annonymous Functions
+
+---
+
+Elixir es un lenguaje funcional, así que no es sorpresa que las funciones sean ciudadanos de primera clase.
+
+Se crean con el keyword *fn* :
+
+```
+  fn
+    parameter-list -> body
+    parameter-list -> body
+  end
+```
+
+```
+  sum = fn (a, b) -> a + b end #Function<12.90072148/2 in :erl_eval.expr/5>
+```
+Es necesario poner un '**.**' para ejecutar las funciones anónimas , aunque vayan sin parámetros.
+```
+  sum.(1,2) #3
+
+  greet = fn -> IO.puts "Hello" end # IO , módulo de operaciones de leer y escribir.
+  greet.()   # "Hello"
+```
+Se pueden omitir los paréntesis en la declaración.
+```
+  f1 = fn a, b -> a * b end
+  f1.(3, 2) # 6
+```
+
+---
+
+En funciones también podemos usar el poderoso Pattern Matching:
+
+```
+  handle_open = fn
+    {:ok, file}  -> "Read data : #{IO.read(file, :line)}"
+    { _, error} -> "Error : #{:file.format_error(error)}" #interoperabilidad con Erlang
+    end
+
+  handle_open.(File.open("/Users/manu/myprojects/testing_elixir/mix.exs"))
+  #"Read data: defmodule TestingElixir.Mixfile do\n"
+
+  handle_open.(File.open("no_exists")) #"Error: no such file or directory"
+```
+
+A la función anónima *handle_open* le asignamos dos contratos:
+  * Si le llega como parametro una tupla de {:ok, <*fichero*>} leer fichero
+  * Si le llega como parametro una tupla de { <*ignoro campo*>, error} escupe error
+
+Nos hemos ayudado a su vez de *File.open(<*string ruta fichero*>)* la cual dá como resultados los contratos que pueden recibir la función *handle_open*
+
+```
+File.open("/home/exist.txt") # {:ok, #PID<0.132.0>}
+
+File.open("no exist")
+# {:error, :enoent}  -> :file.format_error(:enoent) -> "no such file or directory"
+```
+---
+
+class: center, middle
+
+# Modules and named functions
+
+---
+
+Para estructurar el código , Elixir proporciona los módulos, donde se escriben las funciones.
+Tanto los módulos como las funciones , se agrupan con el bloque *do..end*.
+Primero , creamos un fichero , por ej: **times.exs**
+```
+defmodule Times do
+  def double(n) do
+    n*2
+  end
+end
+```
+En Erlang/Elixir las funciones se representan, con el nombre de la función y su número de parámetros. Esta función se representaría como **double/1** , porque tiene un parámetro.
+
+Si tu función es de una línea, se puede usar esta forma :
+```
+def double(n) , do: n*2
+```
+
+Para compilar el módulo, podríamos hacerlo de dos formas:
+  * ```bash
+    $ iex times.exs
+    iex> Times.double 4 # 8
+    ```
+  * ```bash
+    iex> c "times.exs" # [Times]
+    iex> Times.double 4 # 8
+    ```
+
+---
+# Pattern Matching
+
+Se definen tantas funciones, como contratos dispongamos para el pattern matching. Lo que cambia es el argumento de estas funciones, así como su implementación.
+
+Por ej , Factorial :
+
+  * factorial(0) → 1
+  * factorial(n) → n * factorial(n - 1)
+
+```
+defmodule Factorial do
+  def of(0), do: 1
+  def of(n), do: n * of(n-1)
+end
+```
+
+Como vemos tenemos **dos definiciones de la misma función**. Si llamamos a *Factorial.of(2)* ,Elixir machea primero  el argumento 2 contra la primera fn de argumento 0, esta falla y lo intenta con la siguiente de argumento *n*, en la que entra.
+
+---
+
+# Guard Clauses
+
+Hemos visto como utilizar el pattern matching dentro de las funciones, pero y si quisieramos distinguir que función es invocada dependiento del tipo del parametro o del valor de este. Para ello se utilizan las **Guard Clauses**.
+
+Por ejemplo en el caso anterior de Factorial , si pasamos un número negativo , haría un loop infinito; así que vamos a arreglarlo:
+
+```
+  defmodule Factorial do
+    def of(0), do: 1
+    def of(n) when n > 0 do
+      n * of(n-1)
+    end
+  end
+```
+
+---
+
+# Alias, require and import
+* **alias** sirve para acortar nombres a cualquier modulo.
+  ```
+    defmodule Math do
+      alias Math.List, as: List
+    end
+  ```
+* **require** es usado para importar macros.
+
+  ```bash
+    iex> Integer.is_odd(3) # (CompileError) iex:1: you must require Integer...
+    iex> require Integer #nil
+    iex> Integer.is_odd(3) #true
+  ```
+
+* **import** para acceder fácilmente a las funciones o macros de otros módulos.
+
+  ```
+    defmodule MyList do
+      import Integer, only: [is_odd: 1]
+    end
+
+    import Integer, only: :macros
+
+    import Integer, only: :functions
+
+  ```
+
+---
+
+# The pipe operator |>
+
+Coge el resultado de la operación de la izquierda y lo inserta como primer parámetro en la operación de la derecha.
+
+Por ej, este código es dificil de leer porque lo lees de abajo a arriba para entenderlo.
+
+```ruby
+people = DB.find_customers
+orders = Orders.for_customers(people)
+tax    = sales_tax(orders, 2013)
+filing = prepare_filing(tax)
+```
+
+En cambio si usamos el *pipe operator* el código fluye en orden lógico:
+```ruby
+filing = DB.find_customers
+           |> Orders.for_customers
+           |> sales_tax(2013)
+           |> prepare_filing
+```
+
+---
+
+class: center, middle
+
+# Destructure and Recursion
+
+---
+
+Para destructurar las Listas se utiliza el patrón **[head | tail]** dentro de los argumentos de las funciones que reciban listas.
+
+Vamos a ver un ejemplo , vamos a sumar los elementos de una lista, donde deberemos mantener el *total*  :
+
+*  sum([]) → 0
+*  sum([ head |tail ]) → «total» + sum(tail)
+
+```
+  defmodule MyList do
+    def sum([], total), do: total
+    def sum([ head | tail ], total), do: sum(tail, head+total)
+  end
+```
+
+```
+ MyList.sum([], 0) #0
+ MyList.sum([11,12,13,14,15], 0) #65
+```
+
+Tener que recordar el  parámetro extra *total* es un poco tedioso. Vamos a ver como esconderlo!
+
+---
+
+Se puede esconder si sabemos su valor inicial, y sí lo sabemos , es 0.
+
+```
+defmodule MyList do
+  def sum(list), do: _sum(list, 0)
+
+  # private methods
+  defp _sum([], total), do: total
+  defp _sum([ head | tail ], total), do: _sum(tail, head+total)
+end
+```
+
+Declarando dos metodos privados que acepten el total como argumento lo conseguimos.
+
+Vemos que con **defp** declaramos metodos privados, los cuales normalmente se llaman con *_* por delante.
+
+Pero y ¿Por qué no generalizamos esta función?, vamos a hacernos nuestro **reduce** !!
+
+---
+Primero necesitamos como argumentos una lista y un valor inicial.
+Además sabemos que para generalizar una función , necesitamos también pasarle como argumento otra función que aplique sobre los elementos. (**Higher order function**).
+
+Ya sabemos los argumentos para nuestro reduce :**(collection, init_value, fun)**
+
+Vamos a pensar el diseño recursivo :
+
+  * reduce([], value, _) → value
+
+  * reduce([ head |tail ], value, fun) → reduce(tail, fun.(head, value), fun)
+
+```
+defmodule MyList do
+  def reduce([], value, _) do
+    value
+  end
+  def reduce([head | tail], value, func) do
+    reduce(tail, func.(head, value), func)
+  end
+end
+
+MyList.reduce([1,2,3,4,5], 0, &(&1 + &2)) # 15 # funciones anónimas con **&()**
+
+MyList.reduce([1,2,3,4,5], 1, &(&1 * &2)) # 120
+```
+
+No hace falta crear un reduce!! , ya existe en Elixir, en el modulo **Enum**.
+
+
+---
+
+class: center, middle
+
+# Dictionaries: Keywords, Maps, HashDicts, Structs and Sets.
+
+---
+# Keywords List
+
+Son importantes porque tienen 3 características:
+  * Las claves deben ser atoms.
+  * Las claves están ordenadas, segun el desarrollador.
+  * Las claves se pueden repetir.
+
+```ruby
+list = [{:a, 1}, {:b, 2}]  #[a: 1, b: 2]
+list == [a: 1, b: 2]  #true
+list[:a]  #1
+
+
+list ++ [c: 3]  #[a: 1, b: 2, c: 3]
+[a: 0] ++ list  #[a: 0, a: 1, b: 2]
+
+
+new_list = [a: 0] ++ list  #[a: 0, a: 1, b: 2]
+new_list[:a]  #0
+```
+---
+# Maps y HashDicts
+
+  * **Maps**
+  ```
+    %{ four: 4, five: 5, six: 6 }
+  ```
+  * **HashDict** : clave - valor
+  ```bash
+  iex> hashdict = Enum.into [name: "Manu", likes: "Programming"], HashDict.new
+  # #HashDict<[name: "Dave", where: "Dallas", likes: "Programming"]>
+  ```
+
+Para operar con Maps y HashDicts se utiliza el módulo **Dict**.
+
+```ruby
+defmodule Sum do
+  def values(dict) do
+      dict |> Dict.values |> Enum.sum
+  end
+end
+
+# Sum a HashDict
+hd = [ one: 1, two: 2, three: 3 ] |> Enum.into HashDict.new
+IO.puts Sum.values(hd) # => 6
+
+# Sum a Map
+map = %{ four: 4, five: 5, six: 6 }
+IO.puts Sum.values(map) # => 15
+```
+---
+
+#Structs I
+
+Es un typed map , que puede tener parámetros por defecto, y que puede accederse a él por pattern matching en tipos asi como por su contenido.
+
+```ruby
+defmodule Subscriber do
+  defstruct name: "", paid: false, over_18: true
+end
+
+s1 = %Subscriber{ name: "Mary", paid: true }
+# %Subscriber{name: "Mary", over_18: true, paid: true}
+
+```
+
+Puedes acceder a sus propidades con '.' ó pattern matching.
+```ruby
+s1.name # "Mary"
+%Subscriber{name: a_name} = s1 #%Subscriber{name: "Mary", over_18: true, paid: true}
+a_name #"Mary"
+```
+
+Y actualizarlo así:
+
+```ruby
+s2 = %Subscriber{ s1 | name: "Marie"}
+# %Subscriber{name: "Marie", over_18: true, paid: true}
+```
+---
+
+#Structs II
+
+Los *structs* se definen dentro de los modulos porque normalmente se les añede funcionalidad:
+
+```
+defmodule Attendee do
+  defstruct name: "", paid: false, over_18: true
+
+  def may_attend_after_party(attendee = %Attendee{}) do
+    attendee.paid && attendee.over_18
+  end
+end
+```
+
+```ruby
+a1 = %Attendee{name: "Dave", over_18: true}
+# %Attendee{name: "Dave", over_18: true, paid: false}
+
+Attendee.may_attend_after_party(a1) #false
+```
+
+---
+
+#Sets
+
+Hay una sola implementación para los sets y es con **HashSet**
+
+```ruby
+iex> set1 = Enum.into 1..5, HashSet.new  #HashSet<[1, 2, 3, 4, 5]>
+
+iex> Set.member? set1, 3  #true
+
+iex> set2 = Enum.into 3..8, HashSet.new  #HashSet<[3, 4, 5, 6, 7, 8]>
+
+iex> Set.union set1, set2  #HashSet<[7, 6, 4, 1, 8, 2, 3, 5]>
+
+iex> Set.difference set1, set2  #HashSet<[1, 2]>
+
+iex> Set.difference set2, set1  #HashSet<[6, 7, 8]>
+
+iex> Set.intersection set1, set2  #HashSet<[3, 4, 5]>
+```
+
+---
+
+class: center, middle
+
+# Muchas Gracias!
+
+
+
+## @manute
+
+---
+
+# Resources
+
+  * [Programming Elixir](https://pragprog.com/book/elixir/programming-elixir)
+
+  * [Elixir - official page](http://elixir-lang.org/)
+
+
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create({
+        highlightLanguage: 'elixir',
+        highlightStyle: 'github'
+      });
+    </script>
+  </body>
+</html>
