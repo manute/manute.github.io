@@ -626,37 +626,40 @@ end
  MyList.sum([11,12,13,14,15]) #65
 ```
 
-Pero ... esto es un **reduce** !!!
+¿Y si generalizamos esta función?
 
-Vamos a hacer nuestro propio reduce...
+Vamos a hacer nuestra propia **higher order function**, ya que esto es un *reduce*.
 
 ---
-# Higher Order Function
+### Higher Order Function - nuestro Reduce
 
-Argumentos para nuestro reduce : **(collection, init_value, fun)**
+* coge una o más funciones como args
+* devuelve otra función
+
+Args para nuestro reduce : **(collection, init_value, function)**
 
 Vamos a pensar el diseño recursivo :
 
   * reduce([], value, _) → value
 
-  * reduce([ head |tail ], value, fun) → reduce(tail, fun.(head, value), fun)
+  * reduce([ head |tail ], value, fn) → reduce(tail, fn.(head, value), fn)
 
 ```
 defmodule MyList do
   def reduce([], value, _) do
     value
   end
-  def reduce([head | tail], value, func) do
-    reduce(tail, func.(head, value), func)
+  def reduce([head | tail], value, fn) do
+    reduce(tail, fn.(head, value), fn)
   end
 end
 
-MyList.reduce([1,2,3,4,5], 0, &(&1 + &2)) # 15 # funciones anónimas con **&()**
+MyList.reduce([1,2,3,4,5], 0, &(&1 + &2)) # 15 # fn anónimas con **&()**
 
 MyList.reduce([1,2,3,4,5], 1, &(&1 * &2)) # 120
 ```
 
-###El reduce ya existe en Elixir, en el modulo **Enum**.
+**El reduce ya existe en Elixir, en el modulo Enum. **
 
 
 ---
@@ -842,6 +845,51 @@ class: center, middle
  ```
 
 ---
+
+class: center, middle
+
+# Enum y Streams
+
+---
+##Enum
+
+ * Es el modulo más usado
+ * manipula collecciones : **filter, map, reduce , etc **
+ * consume toda la collección
+
+ ```
+ list = Enum.to_list 1..5 # [1, 2, 3, 4, 5]
+
+ Enum.map(list, &(&1 * 10)) # [10, 20, 30, 40, 50]
+
+ Enum.at(10..20, 3) # 13
+
+ Enum.filter(list, &(&1 > 2)) # [3, 4, 5]
+
+ Enum.take(list, 3) # [1, 2, 3]
+
+ Enum.reduce(1..100, &(&1+&2)) # 5050
+ Enum.reduce(1..100, 10, &(&1+&2)) # 5060
+
+ ```
+---
+##Streams
+
+ * no consumen toda la colleción -  **lazy**
+ * son para componer Enumerators - **composables**
+ * NO crean listas intermedias
+
+```
+[1,2,3,4]
+  |> Stream.map(&(&1*&1))
+  |> Stream.map(&(&1+1))
+  |> Stream.filter(fn x -> rem(x,2) == 1 end)
+  |> Enum.to_list
+
+ # [5, 17]
+
+ ```
+---
 class: center, middle
 
 # Concurrencia
@@ -920,8 +968,7 @@ iex> c("spawn1.ex")
 
 ---
 
-## Mensajes entre procesos
-
+###  Mensajes entre procesos
 ```
 defmodule Spawn2 do
   def greet do
