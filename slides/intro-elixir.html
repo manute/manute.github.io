@@ -60,7 +60,7 @@ class: center, middle
 
 * **Integers**
   ```
-  1234 #decimal
+  1234
   0b1010 #binary
   0xcafe #hexadecimal
   0o765 #octal
@@ -85,7 +85,7 @@ class: center, middle
   ```
 * **Range**
 
-  *start..end* y pueden ser de cualquier tipo. Si se quiere iterar sobre sus valores  deben ser *Integers*.
+  *start..end*. Para iterar sobre sus valores deben ser *Integers*.
 
   ```
   1..10
@@ -124,14 +124,14 @@ class: center, middle
 
   * Interpolación de código utilizando la sintaxis *#{...}*.
   ```ruby
-  "Hello, #{String.capitalize "manu"}!" #"Hello, Manu""
+  "Hello, #{String.capitalize "world"}!" #"Hello, world""
   ```
 ---
 **Strings II **
 
   * Sigils
 
-  Mecanismo para trabajar con representaciones de texto, como por ej: *regular expressions*.
+  Mecanismo para trabajar con representaciones de texto.
 
   Empiezan con *~* seguido de una letra mayúscula o minúscula , un delimitador y unas opciones.
   Los delimitadores pueden ser *<...>, {...}, [...], (...), |...|, /.../, "...", y '...'*.
@@ -142,7 +142,7 @@ class: center, middle
 
   * Soportan *Heredocs*
 
-    Cualquier String soporta varias lineas dentro. La *heredoc* notation *"""* arregla que no se queden espacios o saltos entre ellos.Es muy útil para la documentación de modulos y funciones.
+    La *heredoc* notation *"""* arregla que no se queden espacios o saltos entre strings.Es muy útil para la documentación de modulos y funciones.
     ```
     IO.puts "start"
     IO.write """
@@ -284,7 +284,7 @@ Para ejecutarlas es necesario un '**.**' aunque vayan sin parámetros.
 ```
   sum.(1,2) #3
 
-  greet = fn -> IO.puts "Hello" end # IO , módulo de operaciones de leer y escribir.
+  greet = fn -> IO.puts "Hello" end
   greet.()   # "Hello"
 ```
 Se pueden omitir los paréntesis en la declaración.
@@ -295,14 +295,13 @@ Se pueden omitir los paréntesis en la declaración.
 
 ---
 
-
 class: center, middle
 
 # Pattern Matching
 
 ---
 
-En Elixir ``` a = 1 ``` no es un asignación es como una aserción, como un contrato.
+En Elixir * a = 1 * no es un asignación es como una aserción, como un contrato.
 
 Tiene éxito si puede encontrar una manera de hacer que el lado izquierdo sea igual al lado derecho.
 
@@ -310,23 +309,24 @@ Tiene éxito si puede encontrar una manera de hacer que el lado izquierdo sea ig
  a = 1  #  1
  1 = a  #  1
  2 = a  #  ** (MatchError) no match of right hand side value: 1
-```
-En listas:
-```
+
+# En listas:
+
  list = [1, 2 , 3]  # [1 , 2, 3]
  [a , b , c ] = list # a → 1 ; b → 2 ; c → 3
-```
-Ignorando valores con  *_* :
-```
+
+# Ignorando valores con  *_* :
+
  [1 , _ , _ ] = [1 , “cat , “dog”] # [1, “cat”, “dog”]
-```
-*head* y *tail* :
-```
+
+# head y tail :
+
  [ h | t ] = [1, 2, 3] # h 1 ; t [2, 3]
 
 ```
 
 ---
+
 En funciones anónimas :
 
 ```
@@ -337,10 +337,10 @@ En funciones anónimas :
 ```
 
 A **handle_open** le asignamos dos contratos:
-  * una tupla de {:ok, <*fichero*>}  => leer fichero
+  * una tupla de {:ok, *fichero*}  => leer fichero
   * una tupla de { _, error} => print error formateado
 
-Usamos *File.open(<*string ruta fichero*>)* para abrir ficheros:
+Usamos *File.open(*string ruta fichero*)* para abrir ficheros:
 
 ```
 good_file = File.open("/home/exist.txt") # {:ok, #PID<0.132.0>}
@@ -363,6 +363,7 @@ class: center, middle
 # case, cond and if
 
 ---
+
 * case
   ```
   case {1, 2, 3} do
@@ -1002,10 +1003,42 @@ iex> c("spawn2.ex")
 
 ```
 ---
+
+class: center, middle
+
+# Nodes: servicios distribuidos
+
+---
+* son simples intancias de la Erlang VM
+  ```bash
+  iex> Node.self # :nonode@nohost
+  ```
+* se pueden nombrar con el comando *--name*
+  ```bash
+    $ iex --name test@slides.local
+
+    iex(test@slides.local)1> Node.self # :"test@slides.local"
+  ```
+* se puden conectar entre ellos
+    ```bash
+    * terminal 1
+    $ iex --name node_one@test.local
+
+    * terminal 2
+    $ iex --name node_two@test.local
+
+    iex(node_two@test.local)> Node.list # []
+    iex(node_two@test.local)> Node.connect :"node_one@test.local" # true
+    iex(node_two@test.local)> Node.list # [:"node_one@test.local"]
+
+    * terminal 1
+
+    iex(node_one@test.local)> Node.list # [:"node_two@test.local"]
+    ```
+---
 class: center, middle
 
 # Muchas Gracias!
-
 
 
 ## @manute
@@ -1017,7 +1050,6 @@ class: center, middle
   * [Programming Elixir](https://pragprog.com/book/elixir/programming-elixir)
 
   * [Elixir - official page](http://elixir-lang.org/)
-
 
 
     </textarea>
