@@ -1036,6 +1036,103 @@ class: center, middle
     iex(node_one@test.local)> Node.list # [:"node_two@test.local"]
     ```
 ---
+  Ejemplo, de un servidor que manda una notificacion cada 2 s.
+  ```
+  defmodule Ticker do
+    @interval 2000 # 2 seconds
+    @name :ticker
+
+    # Lanzamos el proceso y lo registramos globalmente
+    def start do
+      pid = spawn(__MODULE__, :generator, [[]])
+      :global.register_name(@name, pid)
+    end
+
+    # registramos al cliente con su pid asociándolo al servidor
+    def register(client_pid) do
+      send :global.whereis_name(@name), { :register, client_pid }
+    end
+
+    # escuchamos 2 eventos continuamente:
+    # 1 - muestra los clientes conectados
+    # 2 - manda un mensaje a todos los clientes
+    def generator(clients) do
+      receive do
+        { :register, pid } ->
+          IO.puts "registering #{inspect pid}"
+          generator([pid|clients])
+      after
+        @interval ->
+          IO.puts "tick"
+          Enum.each clients, fn(client) ->
+            send client, { :tick }
+          end
+          generator(clients)
+      end
+    end
+  end
+  ```
+---
+Cliente, para recibir la notif. crearemos un cliente registrado con el servidor.
+Suponemos que está en el mismo fichero que el servidor *Ticker*
+```
+
+  defmodule Client do
+
+    # lanzamos proceso y lo asociamos con el servidor
+    def start do
+      pid = spawn(__MODULE__, :receiver, [])
+      Ticker.register(pid)
+    end
+
+    # evento que escucha continuamente y cuando recibimos { :tick}
+    def receiver do
+      receive do
+        { :tick } ->
+          IO.puts "tock in client"
+          receiver
+      end
+    end
+  end
+```
+---
+```bash
+* terminal 1
+    $ iex --name one@test.local
+
+    iex(one@test.local)> c("ticker.ex")
+
+* terminal 2
+    $ iex --name two@test.local
+
+* terminal 1
+
+    iex(one@test.local)> Node.connect :"two@test.local"
+      true
+    iex(one@test.local)> Ticker.start
+      :yes
+      tick
+      tick
+    iex(one@test.local)> Client.start
+      registering #PID<0.59.0>
+      {:register,#PID<0.59.0>}
+      tick
+      tock in client
+      tick
+      tock in client
+      :     :   :
+
+* terminal 2
+    $ iex --name two@test.local
+    iex(two@test.local)> c("ticker.ex")
+    iex(two@test.local)> Client.start
+      {:register,#PID<0.53.0>}
+      tock in client
+      tock in client
+      tock in client
+      :     :   :
+```
+---
 class: center, middle
 
 # Muchas Gracias!
