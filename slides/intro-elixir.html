@@ -27,7 +27,6 @@ class: center, middle
 
 ---
 
-# ¿Qué es?
 
 Lenguaje dinámico y funcional de proposito general que corre sobre la Erlang VM, conocida por su funcionamiento de baja latencia y alta disponibilidad en sistemas distribuidos.
 
@@ -35,15 +34,18 @@ Lenguaje dinámico y funcional de proposito general que corre sobre la Erlang VM
 
 ---
 
-# ¿Características principales?
+# Características principales
 
-* Inmutabilidad
+* Inmutable Data
 * Pattern Matching
 * Concurrencia - Erlang VM (Actors)
 * Sintaxis (a la Ruby)
 * Protocols (a la Clojure)
 * Macros
 * OTP (herramintas y conjunto de librerias)
+  * Genservers  - comportamiento cliente-servidor
+  * Supervisors - tolerancia fallos y recuperación
+  * Application - módulo para aplicaciones
 * REPL (read-eval-print-loop)
 * Hot Code Swapping
 
@@ -462,8 +464,7 @@ Entonces dentro del iex ya tendríamos el módulo:
 
 
 
-
-  (Como herramienta de construcción se usa el **mix** , compilación , tests etc.)
+  (Como herramienta de construcción, compilación y tests se usa **[mix](http://elixir-lang.org/getting_started/mix_otp/1.html)**)
 
 ---
 
@@ -601,7 +602,7 @@ Vamos a diseñar el contrato recursivo:
 
 Tener que pasar el parámetro *total* es un poco tedioso e innecesario.
 
-Vamos a ver como esconderlo!
+Vamos a ver como encapsularlo.
 
 ---
 
@@ -724,7 +725,7 @@ IO.puts Sum.values(map) # => 15
 #Structs I
 
 * extension de maps
-* en conjunción con **protocols** conseguimos polimorfismo
+* puden asociarse a los **protocols** para polimorfismo
 * puede tener parámetros por defecto
 
 ```ruby
@@ -930,7 +931,7 @@ iex> SpawnBasic.greet Hello
 ```
 Corrámoslo en un proceso separado con
 
-**spawn(<*module_name*>, <*function_name_atom*>, <*opts*>)**
+**spawn(<*module*>, <*function*>, <*args*>, <*opts*>(optional))**
 ```bash
 iex> spawn(SpawnBasic, :greet, [])
 # Hello
@@ -947,7 +948,8 @@ iex> spawn(SpawnBasic, :greet, [])
 defmodule Spawn1 do
   def greet do
     receive do
-      {sender, msg} -> send sender, { :ok, "Hello, #{msg}" }
+      {sender, msg} ->
+        send sender, { :ok, "Hello, #{msg}" }
     end
   end
 end
@@ -956,7 +958,8 @@ pid = spawn(Spawn1, :greet, [])
 send pid, {self, "World!"}
 
 receive do
-  {:ok, message} -> IO.puts message
+  {:ok, message} ->
+    IO.puts message
 end
 ```
 
@@ -1000,6 +1003,64 @@ iex> c("spawn2.ex")
      Hello World!
      Hello Kermit!
      [Spawn2]
+
+```
+---
+# Linkar Procesos
+
+  Para compartir el comportamiento de dos procesos. Si uno termina de alguna forma , el otro muere. Con *OTP Supervisors* se podrían relanzar.
+  ```
+  defmodule Link2 do
+    import :timer, only: [ sleep: 1 ]
+
+    # termina el proceso al medio seg.
+    def sad_function do
+      sleep 500
+      exit(:boom)
+    end
+
+    def run do
+      spawn_link(Link2, :sad_function, [])
+      receive do
+        msg ->
+          IO.puts "MESSAGE RECEIVED: #{inspect msg}"
+      after 1000 ->
+          IO.puts "Nothing happened as far as I am concerned"
+      end
+    end
+  end
+
+  Link.run # ** (EXIT from #PID<0.35.0>) :boom
+  ```
+
+---
+# Monitorizar Procesos
+Notifica la terminación de un proceso.
+```
+  defmodule Monitor1 do
+    import :timer, only: [ sleep: 1 ]
+
+    # termina el proceso al medio seg.
+    def sad_function do
+      sleep 500
+      exit(:boom)
+    end
+
+    def run do
+      res = spawn_monitor(Monitor1, :sad_method, [])
+      IO.puts inspect res
+      receive do
+        msg ->
+          IO.puts "MESSAGE RECEIVED: #{inspect msg}"
+      after 1000 ->
+          IO.puts "Nothing happened as far as I am concerned"
+      end
+    end
+  end
+
+  Monitor1.run
+   #{PID<0.37.0>,#Reference<0.0.0.53>}
+   #MESSAGE RECEIVED: {:DOWN,#Reference<0.0.0.53>,:process,#PID<0.37.0>,:boom}
 
 ```
 ---
